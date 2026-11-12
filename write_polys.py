@@ -15,7 +15,39 @@ POLYS: PolysType = [
 ]
 
 
+class Field:
+    def __set_name__(self, owner, name):
+        self._name = name
+
+    def __get__(self, obj, owner=None):
+        return obj.__dict__[self._name]
+
+    def __set__(self, obj, val):
+        obj.__dict__[self._name] = val
+
+
+class FieldFmt(Field):
+    def __init__(self, fmt):
+        self.fmt = fmt
+
+    def __set__(self, obj, val):
+        super().__set__(obj, val)
+        obj._size += struct.calcsize(self.fmt)
+
+
+class FieldCls(Field):
+    def __init__(self, cls):
+        self.cls = cls
+
+    def __set__(self, obj, val):
+        super().__set__(obj, val)
+        obj._size += self.cls._size
+
+
 class Point:
+    x = FieldFmt("<d")
+    y = FieldFmt("<d")
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -29,6 +61,9 @@ class Point:
 
 
 class Bbox:
+    p1 = FieldCls(Point)
+    p2 = FieldCls(Point)
+
     def __init__(self, polys: PolysType = POLYS):
         self.p1 = Point(
             min(x for x, _ in chain(*polys)), min(y for _, y in chain(*polys))
@@ -46,6 +81,10 @@ class Bbox:
 
 
 class Header:
+    magic = FieldFmt("<i")
+    bbox = FieldCls(Bbox)
+    num_polys = FieldFmt("<i")
+
     def __init__(self, polys: PolysType = POLYS):
         self.magic = 0x1234
         self.bbox = Bbox(polys)
@@ -66,12 +105,14 @@ class Header:
 
     @classmethod
     def from_file(cls, f: BinaryIO) -> Self:
-        sz: int = 40
-        buf = f.read(sz)
+        buf = f.read(cls._size)
+        r1 = slice(0, cls.magic._size)
+        r2 = slice(cls.magic._size, cls.bbox._size)
+        r3 = slice(cls.bbox._size, cls.num_polys._size)
         return cls(
-            struct.unpack("<i", buf[0:4])[0],
-            Bbox.from_file(buf[4:36]),
-            struct.unpack("<i", buf[36:40])[0],
+            struct.unpack("<i", buf[r1])[0],
+            Bbox.from_file(buf[r2]),
+            struct.unpack("<i", buf[r3])[0],
         )
 
 
