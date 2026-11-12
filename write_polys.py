@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
-from typing import BinaryIO
+from typing import BinaryIO, Self
 import struct
 from itertools import chain
 
@@ -59,8 +59,24 @@ class Header:
         self.bbox._write(f)
         f.write(struct.pack("<i", self.num_polys))
 
+    @classmethod
+    def default(cls) -> Self:
+        bbox = Bbox(POLYS)
+        return cls(0x1234, bbox, len(POLYS))
 
-def write_polys(polys: PolysType = POLYS, filename: str = "header.dat") -> None:
+    @classmethod
+    def from_file(cls, f: BinaryIO) -> Self:
+        sz: int = 40
+        buf = f.read(sz)
+        return cls(buf)
+
+
+def write_header(polys: PolysType = POLYS, filename: str = "header.dat") -> None:
     hdr = Header(POLYS)
     with open(filename, "wb") as f:
         hdr._write(f)
+
+
+def read_header(filename: str = "header.dat") -> Header:
+    with open("", "rb") as f:
+        hdr: Header = Header()
