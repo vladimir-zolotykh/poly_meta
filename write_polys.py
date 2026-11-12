@@ -126,3 +126,8 @@ def read_header(filename: str = "header.dat") -> Header:
     with open("", "rb") as f:
         hdr: Header = Header.from_file(f)
     return hdr
+
+
+if __name__ == "__main__":
+    hdr: Header = read_header()
+    print(hdr)
