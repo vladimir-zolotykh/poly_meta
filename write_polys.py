@@ -123,7 +123,7 @@ def write_header(polys: PolysType = POLYS, filename: str = "header.dat") -> None
 
 
 def read_header(filename: str = "header.dat") -> Header:
-    with open("", "rb") as f:
+    with open(filename, "rb") as f:
         hdr: Header = Header.from_file(f)
     return hdr
 
