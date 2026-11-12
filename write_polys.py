@@ -68,7 +68,11 @@ class Header:
     def from_file(cls, f: BinaryIO) -> Self:
         sz: int = 40
         buf = f.read(sz)
-        return cls(buf)
+        return cls(
+            struct.unpack("<i", buf[0:4])[0],
+            Bbox.from_file(buf[4:36]),
+            struct.unpack("<i", buf[36:40])[0],
+        )
 
 
 def write_header(polys: PolysType = POLYS, filename: str = "header.dat") -> None:
@@ -79,4 +83,5 @@ def write_header(polys: PolysType = POLYS, filename: str = "header.dat") -> None
 
 def read_header(filename: str = "header.dat") -> Header:
     with open("", "rb") as f:
-        hdr: Header = Header()
+        hdr: Header = Header.from_file(f)
+    return hdr
