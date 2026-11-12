@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+from typing import BinaryIO
+import struct
 from itertools import chain
 
 PointType = tuple[float, float] | list[float]
@@ -21,6 +23,10 @@ class Point:
     def __repr__(self):
         return f"Point({self.x}, {self.y})"
 
+    def _write(self, f: BinaryIO):
+        f.write(struct.pack("<d", self.x))
+        f.write(struct.pack("<d", self.y))
+
 
 class Bbox:
     def __init__(self, polys: PolysType = POLYS):
@@ -30,6 +36,10 @@ class Bbox:
         self.p2 = Point(
             max(x for x, _ in chain(*polys)), max(y for _, y in chain(*polys))
         )
+
+    def _write(self, f: BinaryIO):
+        self.p1._write(f)
+        self.p2._write(f)
 
     def __repr__(self):
         return f"Bbox({self.p1}, {self.p2})"
@@ -41,6 +51,16 @@ class Header:
         self.bbox = Bbox(polys)
         self.num_polys = len(polys)
 
+    def __repr__(self):
+        return f"Header({self.magic}, {repr(self.bbox)}, {self.num_polys})"
 
-def write_polys(polys: PolysType = POLYS) -> None:
-    pass
+    def _write(self, f: BinaryIO) -> None:
+        f.write(struct.pack("<i", self.magic))
+        self.bbox._write(f)
+        f.write(struct.pack("<i", self.num_polys))
+
+
+def write_polys(polys: PolysType = POLYS, filename: str = "header.dat") -> None:
+    hdr = Header(POLYS)
+    with open(filename, "wb") as f:
+        hdr._write(f)
