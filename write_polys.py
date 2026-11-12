@@ -35,5 +35,12 @@ class Bbox:
         return f"Bbox({self.p1}, {self.p2})"
 
 
+class Header:
+    def __init__(self, polys: PolysType = POLYS):
+        self.magic = 0x1234
+        self.bbox = Bbox(polys)
+        self.num_polys = len(polys)
+
+
 def write_polys(polys: PolysType = POLYS) -> None:
     pass
