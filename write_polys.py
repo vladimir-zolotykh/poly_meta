@@ -34,7 +34,6 @@ class FieldFmt(Field):
 
     def __set__(self, obj, val):
         super().__set__(obj, val)
-        obj._size += struct.calcsize(self.fmt)
 
 
 class FieldCls(Field):
@@ -43,7 +42,6 @@ class FieldCls(Field):
 
     def __set__(self, obj, val):
         super().__set__(obj, val)
-        obj._size += self.cls._size
 
 
 class FieldMeta(type):
