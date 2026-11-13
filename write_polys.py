@@ -100,10 +100,10 @@ class Header(metaclass=FieldMeta):
     bbox = FieldCls(Bbox)
     num_polys = FieldFmt("<i")
 
-    def __init__(self, polys: PolysType = POLYS):
+    def __init__(self, magic, bbox, num_polys):
         self.magic = 0x1234
-        self.bbox = Bbox(polys)
-        self.num_polys = len(polys)
+        self.bbox = bbox
+        self.num_polys = num_polys
 
     def __repr__(self):
         return f"Header({self.magic}, {repr(self.bbox)}, {self.num_polys})"
