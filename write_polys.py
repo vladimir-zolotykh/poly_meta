@@ -46,8 +46,22 @@ class FieldCls(Field):
         obj._size += self.cls._size
 
 
-class Point:
-    _size = 0
+class FieldMeta(type):
+    def __new__(mcls, clsname, bases, clsdict):
+        off: int = 0
+        for key, val in clsdict.items():
+            if key[:2] == "__" and key[-2:] == "__":
+                continue
+            if isinstance(val, Field):
+                if isinstance(val, FieldFmt):
+                    off += struct.calcsize(val.fmt)
+                else:
+                    off += val.cls._size
+        clsdict["_size"] = off
+        return super().__new__(mcls, clsname, bases, clsdict)
+
+
+class Point(metaclass=FieldMeta):
     x = FieldFmt("<d")
     y = FieldFmt("<d")
 
@@ -63,8 +77,7 @@ class Point:
         f.write(struct.pack("<d", self.y))
 
 
-class Bbox:
-    _size = 0
+class Bbox(metaclass=FieldMeta):
     p1 = FieldCls(Point)
     p2 = FieldCls(Point)
 
@@ -84,8 +97,7 @@ class Bbox:
         return f"Bbox({self.p1}, {self.p2})"
 
 
-class Header:
-    _size = 0
+class Header(metaclass=FieldMeta):
     magic = FieldFmt("<i")
     bbox = FieldCls(Bbox)
     num_polys = FieldFmt("<i")
@@ -134,6 +146,6 @@ def read_header(filename: str = "header.dat") -> Header:
 
 
 if __name__ == "__main__":
-    write_header()
+    # write_header()
     hdr: Header = read_header()
     print(hdr)
