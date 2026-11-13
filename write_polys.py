@@ -20,6 +20,8 @@ class Field:
         self._name = name
 
     def __get__(self, obj, owner=None):
+        if obj is None:
+            return self
         return obj.__dict__[self._name]
 
     def __set__(self, obj, val):
@@ -45,6 +47,7 @@ class FieldCls(Field):
 
 
 class Point:
+    _size = 0
     x = FieldFmt("<d")
     y = FieldFmt("<d")
 
@@ -61,6 +64,7 @@ class Point:
 
 
 class Bbox:
+    _size = 0
     p1 = FieldCls(Point)
     p2 = FieldCls(Point)
 
@@ -81,6 +85,7 @@ class Bbox:
 
 
 class Header:
+    _size = 0
     magic = FieldFmt("<i")
     bbox = FieldCls(Bbox)
     num_polys = FieldFmt("<i")
@@ -129,5 +134,6 @@ def read_header(filename: str = "header.dat") -> Header:
 
 
 if __name__ == "__main__":
+    write_header()
     hdr: Header = read_header()
     print(hdr)
