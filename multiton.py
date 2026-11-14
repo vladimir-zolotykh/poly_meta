@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+from textwrap import dedent
+
+
 class Multiton(type):
     _instances = {}
 
@@ -22,6 +25,18 @@ class Logger(metaclass=Multiton):
     def __init__(self, name: str):
         print(f"Initializing {name}")
         self.name = name
+
+
+def test_multiton(capsys):
+    main()
+    assert capsys.readouterr().out == dedent(
+        """\
+Initializing tools
+Initializing types
+Initializing file
+Initializing sgream
+    """
+    )
 
 
 def main():
