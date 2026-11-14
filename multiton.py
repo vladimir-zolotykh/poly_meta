@@ -7,7 +7,7 @@ from textwrap import dedent
 class Multiton(type):
     _instances = {}
 
-    def __call__(self, *args, **kwargs):
+    def __call__(cls, *args, **kwargs):
         name = args[0]
         insts = __class__._instances
         if name not in insts:
