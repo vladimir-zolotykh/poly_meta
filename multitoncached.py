@@ -17,18 +17,41 @@ class MultitonCached(type):
         return cached[cls][name]
 
 
-class Person(metaclass=MultitonCached):
+class Model:
+
+    def __repr__(self):
+        args = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
+        return f"{type(self).__name__}({args})"
+
+
+class Person(Model, metaclass=MultitonCached):
+    # _fields = ['name', 'age', 'salary']
     def __init__(self, name, age, salary):
-        print(f"Initializing Person {name = }")
+        for k, v in locals().items():
+            if k != "self":
+                setattr(self, k, v)
+        print(f"Initializing {type(self).__name__} {name = }")
 
 
-class Exercise(metaclass=MultitonCached):
+class Exercise(Model, metaclass=MultitonCached):
+    # _fields = ['name', 'weight', 'reps']
     def __init__(self, name, weight, reps):
-        print(f"Initializing Exercise {name = }")
+        for k, v in locals().items():
+            if k != "self":
+                setattr(self, k, v)
+        print(f"Initializing {type(self).__name__} {name = }")
 
 
 def test_multitoncached(capsys):
     main()
+    assert capsys.readouterr().out == dedent(
+        """\
+Initializing Person name = 'Bob'
+Person(name='Bob', age=37, salary=12000)
+Initializing Exercise name = 'squat'
+Exercise(name='squat', weight=87, reps=2)
+    """
+    )
 
 
 def main():
