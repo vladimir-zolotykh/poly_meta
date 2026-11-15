@@ -23,7 +23,7 @@ class FieldFmt:
     def __get__(self, obj, owner):
         if obj is None:
             return self
-        return struct.unpack(self.fmt, obj._data[self.rng])
+        return struct.unpack(self.fmt, obj._data[self.rng])[0]
 
     def __set__(self, obj, val):
         obj._data[self.rng] = struct.pack(self.fmt, val)
