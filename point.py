@@ -7,20 +7,43 @@ import struct
 class FieldFmt:
     def __init__(self, fmt: str):
         self.fmt = fmt
+        self.start = 0
 
     def __set_name__(self, owner, name):
         self._name = name
 
+    @property
+    def size(self):
+        return struct.calcsize(self.fmt)
+
+    @property
+    def rng(self):
+        return slice(self.start, self.start + self.size)
+
     def __get__(self, obj, owner):
         if obj is None:
             return self
-        return struct.unpack(self.fmt, obj.__dict__[self._name])[0]
+        return struct.unpack(self.fmt, obj._data[self.rng])
 
     def __set__(self, obj, val):
-        obj.__dict__[self._name] = struct.pack(self.fmt, val)
+        obj._data[self.rng] = struct.pack(self.fmt, val)
 
 
-class Point:
+class SizedMeta(type):
+    def __new__(mcls, clsname, bases, clsdict):
+        newdict = dict(clsdict)
+        offset = 0
+        for key, val in clsdict.items():
+            if key[:2] == "__" and key[-2:] == "__":
+                pass
+            if isinstance(val, FieldFmt):
+                val.start = offset
+                offset += val.size
+        newdict["_data"] = bytearray(offset)
+        return super().__new__(mcls, clsname, bases, newdict)
+
+
+class Point(metaclass=SizedMeta):
     x = FieldFmt("<d")
     y = FieldFmt("<d")
 
