@@ -23,13 +23,13 @@ class FieldFmt:
     def __get__(self, obj, owner):
         if obj is None:
             return self
-        return struct.unpack(self.fmt, obj._data[self.rng])[0]
+        return struct.unpack(self.fmt, obj._buf[self.rng])[0]
 
     def __set__(self, obj, val):
-        obj._data[self.rng] = struct.pack(self.fmt, val)
+        obj._buf[self.rng] = struct.pack(self.fmt, val)
 
 
-class SizedMeta(type):
+class StructMeta(type):
     def __new__(mcls, clsname, bases, clsdict):
         newdict = dict(clsdict)
         offset = 0
@@ -39,11 +39,11 @@ class SizedMeta(type):
             if isinstance(val, FieldFmt):
                 val.start = offset
                 offset += val.size
-        newdict["_data"] = bytearray(offset)
+        newdict["_buf"] = bytearray(offset)
         return super().__new__(mcls, clsname, bases, newdict)
 
 
-class Point(metaclass=SizedMeta):
+class Point(metaclass=StructMeta):
     x = FieldFmt("<d")
     y = FieldFmt("<d")
 
@@ -54,4 +54,4 @@ class Point(metaclass=SizedMeta):
 
 if __name__ == "__main__":
     p = Point(1, 2)
-    print(p.x)
+    print(p.x, p.y)
