@@ -40,7 +40,7 @@ class StructMeta(type):
             if isinstance(val, FieldFmt):
                 val.start = offset
                 offset += val.size
-        newdict["_bufsize"] = bytearray(offset)
+        newdict["_bufsize"] = offset
         return super().__new__(mcls, clsname, bases, newdict)
 
 
