@@ -96,6 +96,12 @@ class Bbox(metaclass=StructMeta):
         return f"Bbox({repr(self.p1)}, {repr(self.p2)})"
 
 
+class Header(metaclass=StructMeta):
+    magic = FieldFmt("<i")
+    bbox = FieldCls(Bbox)
+    num_polys = FieldFmt("<i")
+
+
 def test_point(capsys):
     p1 = Point(1, 2)
     p2 = Point(3, 4)
