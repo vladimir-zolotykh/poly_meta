@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
-from typing import Self
 import struct
 
 
@@ -32,6 +31,7 @@ class FieldFmt:
 
 class StructMeta(type):
     def __new__(mcls, clsname, bases, clsdict):
+
         newdict = dict(clsdict)
         offset = 0
         for key, val in clsdict.items():
@@ -40,7 +40,7 @@ class StructMeta(type):
             if isinstance(val, FieldFmt):
                 val.start = offset
                 offset += val.size
-        newdict["_buf"] = bytearray(offset)
+        newdict["_bufsize"] = bytearray(offset)
         return super().__new__(mcls, clsname, bases, newdict)
 
 
@@ -49,10 +49,15 @@ class Point(metaclass=StructMeta):
     y = FieldFmt("<d")
 
     def __init__(self, x: float, y: float):
+        self._buf = bytearray(self._bufsize)
         self.x = x
         self.y = y
 
+    def __repr__(self):
+        return f"Point({self.x}, {self.y})"
+
 
 if __name__ == "__main__":
-    p = Point(1, 2)
-    print(p.x, p.y)
+    p1 = Point(1, 2)
+    p2 = Point(3, 4)
+    print(p1, p2)

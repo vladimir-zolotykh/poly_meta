@@ -52,9 +52,10 @@ class Bbox(metaclass=StructMeta):
         self.p1 = p1
         self.p2 = p2
 
+    def __repr__(self):
+        return f"Bbox({repr(self.p1)}, {repr(self.p2)})"
+
 
 if __name__ == "__main__":
-    p1 = Point(1, 2)
-    p2 = Point(3, 4)
-    b = Bbox(p1, p2)
-    print(b.p1, b.p2)
+    b = Bbox(Point(1, 2), Point(3, 4))
+    print(b)
