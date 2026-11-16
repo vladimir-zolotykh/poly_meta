@@ -14,17 +14,18 @@ class FieldCls:
 
     @property
     def size(self):
-        return self.cls._size
+        return self.cls._bufsize
 
     @property
     def rng(self):
         return slice(self.start, self.start + self.size)
 
-    def __get__(self, obj, owner):
-        if obj is None:
+    def __get__(self, instance, owner):
+        if instance is None:
             return self
-        clsobj = Point.__new__(self.cls)
-        clsobj._buf = obj._buf[self.rng]
+        obj = self.cls.__new__(self.cls)
+        obj._buf = instance._buf[self.rng]
+        return obj
 
     def __set__(self, obj, val):
         obj._buf[self.rng] = val._buf
@@ -33,22 +34,23 @@ class FieldCls:
 class StructMeta(type):
     def __new__(mcls, clsname, bases, clsdict):
         newdict = dict(clsdict)
-        offset = 0
+        offset: int = 0
         for key, val in clsdict.items():
             if key[:2] == "__" and key[-2:] == "__":
                 continue
             if isinstance(val, FieldCls):
                 val.start = offset
                 offset += val.size
-        newdict["_buf"] = bytearray(offset)
+        newdict["_bufsize"] = offset
         return super().__new__(mcls, clsname, bases, newdict)
 
 
 class Bbox(metaclass=StructMeta):
-    p1: Point
-    p2: Point
+    p1 = FieldCls(Point)
+    p2 = FieldCls(Point)
 
     def __init__(self, p1: Point, p2: Point):
+        self._buf = bytearray(self._bufsize)
         self.p1 = p1
         self.p2 = p2
 
@@ -58,4 +60,5 @@ class Bbox(metaclass=StructMeta):
 
 if __name__ == "__main__":
     b = Bbox(Point(1, 2), Point(3, 4))
+    print(b.p1)
     print(b)
