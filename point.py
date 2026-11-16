@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+from typing import Self
 import struct
 
 
@@ -35,7 +36,7 @@ class StructMeta(type):
         offset = 0
         for key, val in clsdict.items():
             if key[:2] == "__" and key[-2:] == "__":
-                pass
+                continue
             if isinstance(val, FieldFmt):
                 val.start = offset
                 offset += val.size
