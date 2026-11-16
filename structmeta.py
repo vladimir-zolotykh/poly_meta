@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 import struct
+from textwrap import dedent
 
 
 class Field:
@@ -34,7 +35,7 @@ class FieldFmt(Field):
         obj._buf[self.rng] = struct.pack(self.fmt, val)
 
 
-class FieldCls:
+class FieldCls(Field):
     def __init__(self, cls: type):
         super().__init__()
         self.cls = cls
@@ -95,9 +96,31 @@ class Bbox(metaclass=StructMeta):
         return f"Bbox({repr(self.p1)}, {repr(self.p2)})"
 
 
+def test_point(capsys):
+    p1 = Point(1, 2)
+    p2 = Point(3, 4)
+    print(p1, p2)
+    assert capsys.readouterr().out == dedent(
+        """\
+Point(1.0, 2.0) Point(3.0, 4.0)
+    """
+    )
+
+
+def test_bbox(capsys):
+    b = Bbox(Point(1, 2), Point(3, 4))
+    print(b)
+    assert capsys.readouterr().out == dedent(
+        """\
+Bbox(Point(1.0, 2.0), Point(3.0, 4.0))
+    """
+    )
+
+
 if __name__ == "__main__":
     p1 = Point(1, 2)
     p2 = Point(3, 4)
     print(p1, p2)
+    print("---------------")
     b = Bbox(Point(1, 2), Point(3, 4))
     print(b)
