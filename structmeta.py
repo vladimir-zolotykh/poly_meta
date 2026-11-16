@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
+from typing import Self
 import struct
 from textwrap import dedent
+
+PointType = tuple[float, float] | list[float]
+PolyType = list[PointType]
+PolysType = list[PolyType]
+POLYS: PolysType = [
+    [(1.0, 2.5), (3.5, 4.0), (2.5, 1.5)],
+    [(7.0, 1.2), (5.1, 3.0), (0.5, 7.5), (0.8, 9.0)],
+    [(3.4, 6.3), (1.2, 0.5), (4.6, 9.2)],
+]
 
 
 class Field:
@@ -101,6 +111,11 @@ class Header(metaclass=StructMeta):
     bbox = FieldCls(Bbox)
     num_polys = FieldFmt("<i")
 
+    @classmethod
+    def default(cls) -> Self:
+        bbox = Bbox(POLYS)
+        return cls(0x1234, bbox, len(POLYS))
+
 
 def test_point(capsys):
     p1 = Point(1, 2)
@@ -130,3 +145,7 @@ if __name__ == "__main__":
     print("---------------")
     b = Bbox(Point(1, 2), Point(3, 4))
     print(b)
+    print("---------------")
+    h: Header = Header.default()
+    hdr = Header(h.magic, h.bbox, h.num_polys)
+    print(hdr)
