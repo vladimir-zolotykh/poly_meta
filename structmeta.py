@@ -136,6 +136,16 @@ class Header(metaclass=StructMeta):
         self.bbox = bbox
         self.num_polys = num_polys
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Header):
+            return (
+                self.magic == other.magic
+                and self.bbox == other.bbox
+                and self.num_polys == other.num_polys
+            )
+        else:
+            return NotImplemented
+
     @classmethod
     def default(cls) -> Self:
         bbox = Bbox.from_polys(POLYS)
