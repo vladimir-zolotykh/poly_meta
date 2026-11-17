@@ -17,7 +17,8 @@ POLYS: PolysType = [
 
 
 class Field:
-    def __init__(self, name, offset):
+    def __init__(self, name: str, offset: int):
+        self._name = name
         self.start = offset
 
     @property
