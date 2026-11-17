@@ -17,11 +17,11 @@ POLYS: PolysType = [
 
 
 class Field:
-    def __init__(self):
-        self.start = 0
+    def __init__(self, name, offset):
+        self.start = offset
 
-    def __set_name__(self, owner, name):
-        self._name = name
+    # def __set_name__(self, owner, name):
+    #     self._name = name
 
     @property
     def rng(self):
@@ -29,8 +29,8 @@ class Field:
 
 
 class FieldFmt(Field):
-    def __init__(self, fmt: str):
-        super().__init__()
+    def __init__(self, name, offset, fmt: str):
+        super().__init__(name, offset)
         self.fmt = fmt
 
     @property
@@ -47,8 +47,8 @@ class FieldFmt(Field):
 
 
 class FieldCls(Field):
-    def __init__(self, cls: type):
-        super().__init__()
+    def __init__(self, name, offset, cls: "StructMeta"):
+        super().__init__(name, offset)
         self.cls = cls
 
     @property
@@ -76,14 +76,9 @@ class StructMeta(type):
                 continue
             if isinstance(val, (str, StructMeta)):
                 if isinstance(val, str):
-                    fld: FieldFmt = FieldFmt(val)
-                    fld.__set_name__(FieldFmt, key)
-                    # fld.start = offset
+                    fld: FieldFmt = FieldFmt(key, offset, val)
                 else:
-                    fld: FieldCls = FieldCls(val)
-                    fld.__set_name__(FieldCls, key)
-                fld.start = offset
-
+                    fld: FieldCls = FieldCls(key, offset, val)
                 offset += fld.size
             newdict["_bufsize"] = offset
         return super().__new__(mcls, clsname, bases, newdict)
