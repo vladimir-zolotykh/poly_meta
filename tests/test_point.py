@@ -13,7 +13,7 @@ Point(1.0, 2.0) Point(3.0, 4.0)
     )
 
 
-def test_point_write_read_file(capsys):
+def test_point_write_read_file():
     p1 = Point(1, 2)
     with open("point.dat", "wb") as f:
         f.write(p1._buf)

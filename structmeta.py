@@ -90,6 +90,12 @@ class Point(metaclass=StructMeta):
         self.x = x
         self.y = y
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Point):
+            return self.x == other.x and self.y == other.y
+        else:
+            return NotImplemented
+
     def __repr__(self):
         return f"Point({self.x}, {self.y})"
 
@@ -108,6 +114,12 @@ class Bbox(metaclass=StructMeta):
         p1 = Point(min(x for x, _ in chain(*polys)), min(y for _, y in chain(*polys)))
         p2 = Point(max(x for x, _ in chain(*polys)), max(y for _, y in chain(*polys)))
         return cls(p1, p2)
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, __class__):
+            return self.p1 == other.p1 and self.p2 == other.p2
+        else:
+            return NotImplemented
 
     def __repr__(self):
         return f"Bbox({repr(self.p1)}, {repr(self.p2)})"
@@ -131,27 +143,6 @@ class Header(metaclass=StructMeta):
 
     def __repr__(self):
         return f"Header({self.magic}, {repr(self.bbox)}, {self.num_polys})"
-
-
-def test_point(capsys):
-    p1 = Point(1, 2)
-    p2 = Point(3, 4)
-    print(p1, p2)
-    assert capsys.readouterr().out == dedent(
-        """\
-Point(1.0, 2.0) Point(3.0, 4.0)
-    """
-    )
-
-
-def test_bbox(capsys):
-    b = Bbox(Point(1, 2), Point(3, 4))
-    print(b)
-    assert capsys.readouterr().out == dedent(
-        """\
-Bbox(Point(1.0, 2.0), Point(3.0, 4.0))
-    """
-    )
 
 
 def test_header(capsys):
