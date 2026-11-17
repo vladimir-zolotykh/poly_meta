@@ -20,9 +20,6 @@ class Field:
     def __init__(self, name, offset):
         self.start = offset
 
-    # def __set_name__(self, owner, name):
-    #     self._name = name
-
     @property
     def rng(self):
         return slice(self.start, self.start + self.size)
@@ -75,10 +72,9 @@ class StructMeta(type):
             if key[:2] == "__" and key[-2:] == "__":
                 continue
             if isinstance(val, (str, StructMeta)):
-                if isinstance(val, str):
-                    fld: FieldFmt = FieldFmt(key, offset, val)
-                else:
-                    fld: FieldCls = FieldCls(key, offset, val)
+                typ = FieldFmt if isinstance(val, str) else FieldCls
+                fld = typ(key, offset, val)
+                newdict[key] = fld
                 offset += fld.size
             newdict["_bufsize"] = offset
         return super().__new__(mcls, clsname, bases, newdict)
