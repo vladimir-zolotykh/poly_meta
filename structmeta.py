@@ -4,6 +4,7 @@
 from typing import Self
 import struct
 from textwrap import dedent
+from itertools import chain
 
 PointType = tuple[float, float] | list[float]
 PolyType = list[PointType]
@@ -102,6 +103,13 @@ class Bbox(metaclass=StructMeta):
         self.p1 = p1
         self.p2 = p2
 
+    @classmethod
+    def from_polys(cls, polys: PolysType = POLYS) -> Self:
+        b = Bbox.__new__(Bbox)
+        b.p1 = Point(min(x for x, _ in chain(*polys)), min(y for _, y in chain(*polys)))
+        b.p2 = Point(max(x for x, _ in chain(*polys)), max(y for _, y in chain(*polys)))
+        return b
+
     def __repr__(self):
         return f"Bbox({repr(self.p1)}, {repr(self.p2)})"
 
@@ -111,9 +119,15 @@ class Header(metaclass=StructMeta):
     bbox = FieldCls(Bbox)
     num_polys = FieldFmt("<i")
 
+    def __init__(self, magic: int, bbox: Bbox, num_polys: int):
+        self._buf = bytearray(self._bufsize)
+        self.magic = magic
+        self.bbox = bbox
+        self.num_polys = num_polys
+
     @classmethod
     def default(cls) -> Self:
-        bbox = Bbox(POLYS)
+        bbox = Bbox.from_polys(POLYS)
         return cls(0x1234, bbox, len(POLYS))
 
 
