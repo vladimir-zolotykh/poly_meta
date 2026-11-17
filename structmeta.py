@@ -74,16 +74,24 @@ class StructMeta(type):
         for key, val in clsdict.items():
             if key[:2] == "__" and key[-2:] == "__":
                 continue
-            if isinstance(val, (FieldFmt, FieldCls)):
-                val.start = offset
-                offset += val.size
+            if isinstance(val, (str, StructMeta)):
+                if isinstance(val, str):
+                    fld: FieldFmt = FieldFmt(val)
+                    fld.__set_name__(FieldFmt, key)
+                    # fld.start = offset
+                else:
+                    fld: FieldCls = FieldCls(val)
+                    fld.__set_name__(FieldCls, key)
+                fld.start = offset
+
+                offset += fld.size
             newdict["_bufsize"] = offset
         return super().__new__(mcls, clsname, bases, newdict)
 
 
 class Point(metaclass=StructMeta):
-    x = FieldFmt("<d")
-    y = FieldFmt("<d")
+    x = "<d"
+    y = "<d"
 
     def __init__(self, x: float, y: float):
         self._buf = bytearray(self._bufsize)
@@ -95,8 +103,8 @@ class Point(metaclass=StructMeta):
 
 
 class Bbox(metaclass=StructMeta):
-    p1 = FieldCls(Point)
-    p2 = FieldCls(Point)
+    p1 = Point
+    p2 = Point
 
     def __init__(self, p1: Point, p2: Point):
         self._buf = bytearray(self._bufsize)
@@ -114,9 +122,9 @@ class Bbox(metaclass=StructMeta):
 
 
 class Header(metaclass=StructMeta):
-    magic = FieldFmt("<i")
-    bbox = FieldCls(Bbox)
-    num_polys = FieldFmt("<i")
+    magic = "<i"
+    bbox = Bbox
+    num_polys = "<i"
 
     def __init__(self, magic: int, bbox: Bbox, num_polys: int):
         self._buf = bytearray(self._bufsize)
