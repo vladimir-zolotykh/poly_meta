@@ -105,10 +105,9 @@ class Bbox(metaclass=StructMeta):
 
     @classmethod
     def from_polys(cls, polys: PolysType = POLYS) -> Self:
-        b = Bbox.__new__(Bbox)
-        b.p1 = Point(min(x for x, _ in chain(*polys)), min(y for _, y in chain(*polys)))
-        b.p2 = Point(max(x for x, _ in chain(*polys)), max(y for _, y in chain(*polys)))
-        return b
+        p1 = Point(min(x for x, _ in chain(*polys)), min(y for _, y in chain(*polys)))
+        p2 = Point(max(x for x, _ in chain(*polys)), max(y for _, y in chain(*polys)))
+        return cls(p1, p2)
 
     def __repr__(self):
         return f"Bbox({repr(self.p1)}, {repr(self.p2)})"
@@ -129,6 +128,9 @@ class Header(metaclass=StructMeta):
     def default(cls) -> Self:
         bbox = Bbox.from_polys(POLYS)
         return cls(0x1234, bbox, len(POLYS))
+
+    def __repr__(self):
+        return f"Header({self.magic}, {repr(self.bbox)}, {self.num_polys})"
 
 
 def test_point(capsys):
