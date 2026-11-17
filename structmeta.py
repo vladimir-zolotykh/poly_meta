@@ -153,6 +153,17 @@ Bbox(Point(1.0, 2.0), Point(3.0, 4.0))
     )
 
 
+def test_header(capsys):
+    h: Header = Header.default()
+    hdr = Header(h.magic, h.bbox, h.num_polys)
+    print(hdr)
+    assert capsys.readouterr().out == dedent(
+        """\
+Header(4660, Bbox(Point(0.5, 0.5), Point(7.0, 9.2)), 3)
+"""
+    )
+
+
 if __name__ == "__main__":
     p1 = Point(1, 2)
     p2 = Point(3, 4)
