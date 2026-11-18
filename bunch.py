@@ -19,9 +19,9 @@ class BunchMeta(type):
 
         def __repr__(self):
             args = ", ".join(
-                f"{key}={val!r}"
+                f"{key}={val2!r}"
                 for key, val in defaults.items()
-                if getattr(self, key) != val
+                if (val2 := getattr(self, key)) != val
             )
             return f"{type(self).__name__}({args})"
 
@@ -47,5 +47,5 @@ class Exercise(Bunch):
 
 
 if __name__ == "__main__":
-    e = Exercise()
+    e = Exercise(name="squat", weight=60.0, reps=4)
     print(e)
