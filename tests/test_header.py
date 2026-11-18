@@ -1,5 +1,5 @@
 from textwrap import dedent
-from structmeta import Point, Bbox, Header
+from structmeta import Header
 
 
 def test_header(capsys):
