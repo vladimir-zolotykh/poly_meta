@@ -49,6 +49,14 @@ class Exercise(Bunch):
     reps: int = 2
 
 
+def test_redefinition_error():
+    with pytest.raises(TypeError, match="Cannot redefine __init__"):
+
+        class E(Bunch):
+            def __init__(self):
+                pass
+
+
 def test_bunchmeta_init_userwarning():
     with pytest.raises(UserWarning, match=re.escape("Argument(s) 'set_no' not used")):
         Exercise(name="squat", weight=60.0, reps=4, set_no=3)
