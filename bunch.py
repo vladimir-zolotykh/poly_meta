@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
-from warnings import warn
+# from warnings import warn
+import warnings
 
 
 class BunchMeta(type):
@@ -15,7 +16,7 @@ class BunchMeta(type):
                     val = kwargs.pop(key)
                 setattr(self, key, val)
             if kwargs:
-                raise warn(f"No variables left for {kwargs.keys()!r}")
+                warnings.warn(f"No variables left for {kwargs.keys()!r}")
 
         def __repr__(self):
             args = ", ".join(
@@ -48,4 +49,6 @@ class Exercise(Bunch):
 
 if __name__ == "__main__":
     e = Exercise(name="squat", weight=60.0, reps=4)
+    print(e)
+    e = Exercise(name="squat", weight=60.0, reps=4, set_no=3)
     print(e)
