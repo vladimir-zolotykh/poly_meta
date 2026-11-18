@@ -49,6 +49,15 @@ class Exercise(Bunch):
     reps: int = 2
 
 
+def test_exercise():
+    e = Exercise(name="bench press", weight=78.5, reps=2)
+    assert str(e) == "Exercise()"
+    e = Exercise(name="squat", weight=60.0, reps=4)
+    assert str(e) == "Exercise(name='squat', weight=60.0, reps=4)"
+    e = Exercise(reps=10)
+    assert str(e) == "Exercise(reps=10)"
+
+
 def test_redefinition_error():
     with pytest.raises(TypeError, match="Cannot redefine __init__"):
 
