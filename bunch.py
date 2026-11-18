@@ -3,6 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 # from warnings import warn
 import warnings
+import pytest
 
 
 class BunchMeta(type):
@@ -45,6 +46,11 @@ class Exercise(Bunch):
     name: str = "bench press"
     weight: float = 78.5
     reps: int = 2
+
+
+def test_bunchmeta_init_userwarning():
+    with pytest.raises(UserWarning, match="No variables left for dict_keys"):
+        Exercise(name="squat", weight=60.0, reps=4, set_no=3)
 
 
 if __name__ == "__main__":
