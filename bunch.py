@@ -3,6 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 # from warnings import warn
 import warnings
+import re
 import pytest
 
 
@@ -17,7 +18,8 @@ class BunchMeta(type):
                     val = kwargs.pop(key)
                 setattr(self, key, val)
             if kwargs:
-                warnings.warn(f"No variables left for {kwargs.keys()!r}")
+                args = ", ".join(f"{v!r}" for v in kwargs)
+                warnings.warn(f"Argument(s) {args} not used")
 
         def __repr__(self):
             args = ", ".join(
@@ -34,7 +36,6 @@ class BunchMeta(type):
                     raise TypeError(f"Cannot redefine {key}")
             else:
                 defaults[key] = val
-                # newdict.__slots__.append(key)
         return super().__new__(mcls, clsname, bases, newdict)
 
 
@@ -49,7 +50,7 @@ class Exercise(Bunch):
 
 
 def test_bunchmeta_init_userwarning():
-    with pytest.raises(UserWarning, match="No variables left for dict_keys"):
+    with pytest.raises(UserWarning, match=re.escape("Argument(s) 'set_no' not used")):
         Exercise(name="squat", weight=60.0, reps=4, set_no=3)
 
 
