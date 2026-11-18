@@ -1,6 +1,8 @@
 .emacs.desktop*
 fluentpython/
 REF/
+point.dat
+bbox.dat
 .polys.bin
 .track_hierarchy.py
 .parmdispatch.py
