@@ -4,7 +4,7 @@
 from warnings import warn
 
 
-class Bunch(type):
+class BunchMeta(type):
     def __new__(mcls, clsname, bases, clsdict):
         newdict = dict(clsdict)
         defaults = {}
@@ -31,9 +31,13 @@ class Bunch(type):
                 if key in newdict:
                     raise TypeError(f"Cannot redefine {key}")
             else:
-                defaults.append(key)
+                defaults[key] = val
                 # newdict.__slots__.append(key)
         return super().__new__(mcls, clsname, bases, newdict)
+
+
+class Bunch(metaclass=BunchMeta):
+    pass
 
 
 class Exercise(Bunch):
