@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
-
-
 from structmeta import StructMeta, Point, POLYS
+
+
+def make_points(polys):
+    res = []
+    for x in polys:
+        if isinstance(x, tuple):
+            res.append(Point(*x))
+        else:
+            res.append(make_points(x))
+    return res
 
 
 class PolyN(metaclass=StructMeta):
@@ -48,11 +56,12 @@ class PolyList(PolyN):
 
 
 if __name__ == "__main__":
-    p3 = Poly3(*(Point(*a) for a in POLYS[0]))
+    polys = make_points(POLYS)
+    p1 = Poly3(*polys[0])
+    print(p1)
+    p2 = Poly4(*polys[1])
+    print(p2)
+    p3 = Poly3(*polys[2])
     print(p3)
-    p4 = Poly4(*(Point(*a) for a in POLYS[1]))
-    print(p4)
-    p3 = Poly3(*(Point(*a) for a in POLYS[2]))
-    print(p3)
-    y = PolyList(Poly3(POLYS[0]), Poly4(POLYS[1]), Poly3(POLYS[2]))
+    y = PolyList(p1, p2, p3)
     print(y)
