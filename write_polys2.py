@@ -47,7 +47,7 @@ def test_read_polys():
     expected = copy.deepcopy(polys)
     with open("polys.dat", "rb") as f:
         polys = read_polys(f)
-        assert polys == expected
+    assert polys == expected
 
 
 if __name__ == "__main__":
