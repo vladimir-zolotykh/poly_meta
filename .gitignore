@@ -2,6 +2,7 @@
 fluentpython/
 REF/
 point.dat
+polys.dat
 bbox.dat
 .polys.bin
 .track_hierarchy.py
