@@ -34,7 +34,8 @@ class Sized:
         sz = struct.calcsize("<dd")
         if isinstance(what, StructMeta):
             assert sz == what._bufsize
-        for off in range(len(self.buf) // struct.calcsize("<dd")):
+        # for off in range(len(self.buf) // struct.calcsize("<dd")):
+        for off in range(0, len(self.buf), sz):
             if isinstance(what, str):
                 r: slice = slice(off, off + sz)
                 yield struct.unpack_from(what, self.buf[r])
@@ -51,7 +52,7 @@ def test_sized():
     with open("polys.dat", "rb") as f:
         (num_polys,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
         for _ in range(num_polys):
-            num_points = 0
+            (num_points,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
             sized = Sized(f.read(num_points * struct.calcsize("<dd")))
             for t in sized.iter_as("<dd"):
                 print(t)
@@ -83,6 +84,7 @@ def test_read_polys():
 
 
 if __name__ == "__main__":
-    with open("polys.dat", "rb") as f:
-        res: PolysType = read_polys(f)
-    print(res)
+    # with open("polys.dat", "rb") as f:
+    #     res: PolysType = read_polys(f)
+    # print(res)
+    test_sized()
