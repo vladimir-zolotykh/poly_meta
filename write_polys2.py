@@ -51,4 +51,6 @@ def test_read_polys():
 
 
 if __name__ == "__main__":
-    print(test_read_polys())
+    with open("polys.dat", "rb") as f:
+        res: PolysType = read_polys(f)
+    print(res)
