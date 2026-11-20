@@ -32,7 +32,8 @@ class Sized:
 
     def iter_as(self, what: str | Point) -> tuple | Point:
         sz = struct.calcsize("<dd")
-        assert sz == what._bufsize
+        if isinstance(what, StructMeta):
+            assert sz == what._bufsize
         for off in range(len(self.buf) // struct.calcsize("<dd")):
             if isinstance(what, str):
                 r: slice = slice(off, off + sz)
