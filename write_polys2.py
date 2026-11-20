@@ -4,7 +4,7 @@
 from typing import BinaryIO
 import struct
 import copy
-from structmeta import Point
+from structmeta import Point, StructMeta
 
 polys = [
     [(1.0, 2.5), (3.5, 4.0), (2.5, 1.5)],
@@ -30,8 +30,20 @@ class Sized:
     def __init__(self, buf: bytearray):
         self.buf = buf
 
-    def iter_as(self, cls_or_fmt: str | Point) -> tuple | Point:
-        pass
+    def iter_as(self, what: str | Point) -> tuple | Point:
+        sz = struct.calcsize("<dd")
+        assert sz == what._bufsize
+        for off in range(len(self.buf) // struct.calcsize("<dd")):
+            if isinstance(what, str):
+                r: slice = slice(off, off + sz)
+                yield struct.unpack_from(what, self.buf[r])
+            elif isinstance(what, StructMeta):
+                obj = what.__new__(what)
+                r: slice = slice(off, what._bufsize)
+                obj._buf = self.buf[r]
+                yield obj
+            else:
+                raise TypeError(f"{what!r} must be `str' or `StructMeta'")
 
 
 def test_sized():
