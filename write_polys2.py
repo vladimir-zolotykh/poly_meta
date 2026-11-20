@@ -4,6 +4,7 @@
 from typing import BinaryIO
 import struct
 import copy
+from structmeta import Point
 
 polys = [
     [(1.0, 2.5), (3.5, 4.0), (2.5, 1.5)],
@@ -23,6 +24,24 @@ def write_polys(f: BinaryIO) -> None:
 
 
 PolysType = list[list[tuple[float, float]]]
+
+
+class Sized:
+    def __init__(self, buf: bytearray):
+        self.buf = buf
+
+    def iter_as(self, cls_or_fmt: str | Point) -> tuple | Point:
+        pass
+
+
+def test_sized():
+    with open("polys.dat", "rb") as f:
+        (num_polys,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
+        for _ in range(num_polys):
+            num_points = 0
+            sized = Sized(f.read(num_points * struct.calcsize("<dd")))
+            for t in sized.iter_as("<dd"):
+                print(t)
 
 
 def read_polys(f: BinaryIO) -> PolysType:
