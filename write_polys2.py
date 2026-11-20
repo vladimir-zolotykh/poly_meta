@@ -27,14 +27,14 @@ PolysType = list[list[tuple[float, float]]]
 
 def read_polys(f: BinaryIO) -> PolysType:
     (num_polys,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
-    polys: PolysType = []
-    for _ in range(num_polys):
-        (num_points,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
-        poly = []
-        for _ in range(num_points):
-            poly.append(struct.unpack("<dd", f.read(struct.calcsize("<dd"))))
-        polys.append(poly)
-    return polys
+    return [
+        [
+            struct.unpack("<dd", f.read(struct.calcsize("<dd")))
+            for _ in range(num_points)
+        ]
+        for _ in range(num_polys)
+        for num_points in struct.unpack("<i", f.read(struct.calcsize("<i")))
+    ]
 
 
 def test_write_polys():
