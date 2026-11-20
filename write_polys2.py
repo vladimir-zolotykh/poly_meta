@@ -26,13 +26,13 @@ PolysType = list[list[tuple[float, float]]]
 
 
 def read_polys(f: BinaryIO) -> PolysType:
-    num_polys, _ = struct.unpack("<i", f.read(struct.calcsize("<i")))
+    (num_polys,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
     polys: PolysType = []
     for _ in range(num_polys):
-        num_points, _ = f.read(struct.calcsize("<"))
+        (num_points,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
         poly = []
         for _ in range(num_points):
-            poly.appand(struct.unpack("<dd", f.read(struct.calcsize("<dd"))))
+            poly.append(struct.unpack("<dd", f.read(struct.calcsize("<dd"))))
         polys.append(poly)
     return polys
 
@@ -48,3 +48,7 @@ def test_read_polys():
     with open("polys.dat", "rb") as f:
         polys = read_polys(f)
         assert polys == expected
+
+
+if __name__ == "__main__":
+    print(test_read_polys())
