@@ -4,6 +4,7 @@
 from typing import BinaryIO
 import struct
 import copy
+import textwrap
 from structmeta import Point, StructMeta
 
 polys = [
@@ -47,7 +48,31 @@ class Sized:
                 raise TypeError(f"{what!r} must be `str' or `StructMeta'")
 
 
-def test_sized():
+def test_sized_fmt(capsys):
+    with open("polys.dat", "rb") as f:
+        (num_polys,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
+        for _ in range(num_polys):
+            (num_points,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
+            sized = Sized(f.read(num_points * struct.calcsize("<dd")))
+            for t in sized.iter_as("<dd"):
+                print(t)
+        assert capsys.readouterr().out == textwrap.dedent(
+            """\
+(1.0, 2.5)
+(3.5, 4.0)
+(2.5, 1.5)
+(7.0, 1.2)
+(5.1, 3.0)
+(0.5, 7.5)
+(0.8, 9.0)
+(3.4, 6.3)
+(1.2, 0.5)
+(4.6, 9.2)
+"""
+        )
+
+
+def test_sized_cls(capsys):
     with open("polys.dat", "rb") as f:
         (num_polys,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
         for _ in range(num_polys):
@@ -57,6 +82,20 @@ def test_sized():
             #     print(t)
             for t in sized.iter_as(Point):
                 print(t)
+        assert capsys.readouterr().out == textwrap.dedent(
+            """\
+Point(1.0, 2.5)
+Point(3.5, 4.0)
+Point(2.5, 1.5)
+Point(7.0, 1.2)
+Point(5.1, 3.0)
+Point(0.5, 7.5)
+Point(0.8, 9.0)
+Point(3.4, 6.3)
+Point(1.2, 0.5)
+Point(4.6, 9.2)
+"""
+        )
 
 
 def read_polys(f: BinaryIO) -> PolysType:
