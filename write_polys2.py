@@ -78,8 +78,6 @@ def test_sized_cls(capsys):
         for _ in range(num_polys):
             (num_points,) = struct.unpack("<i", f.read(struct.calcsize("<i")))
             sized = Sized(f.read(num_points * struct.calcsize("<dd")))
-            # for t in sized.iter_as("<dd"):
-            #     print(t)
             for t in sized.iter_as(Point):
                 print(t)
         assert capsys.readouterr().out == textwrap.dedent(
