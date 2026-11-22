@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 from operator import itemgetter
+import pytest
 
 
 class TupleMeta(type):
@@ -17,7 +18,7 @@ class Tuple(tuple, metaclass=TupleMeta):
     def __new__(cls, *args, **kwargs):
         # cls: <class 'Person'>
         if (n := len(cls._fields)) != len(args):
-            raise TypeError(f"<class {cls.__name__}> gets {n} arguments")
+            raise TypeError(f"<class {cls.__name__!r}> gets {n} arguments")
         return super().__new__(cls, args)
 
 
@@ -28,6 +29,11 @@ class Person(Tuple):
 def test_person():
     bob = Person("Bob", 37, 12000)
     assert str(bob) == "('Bob', 37, 12000)"
+
+
+def test_person_typeerror():
+    with pytest.raises(TypeError, match="<class 'Person'> gets 3 arguments"):
+        Person("Bob", 37)
 
 
 if __name__ == "__main__":
