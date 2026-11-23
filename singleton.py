@@ -28,6 +28,16 @@ def test_logger():
     assert g3 is not g1
 
 
+def test_logger_print(capsys):
+    test_logger()
+    assert capsys.readouterr().out == textwrap.dedent(
+        """\
+Initializing 'g1'
+Initializing 'g3'
+"""
+    )
+
+
 class Singleton(type):
     def __init__(cls, *args, **kwargs):
         super().__init__(*args, **kwargs)
