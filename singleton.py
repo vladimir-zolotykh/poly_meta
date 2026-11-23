@@ -18,6 +18,12 @@ class Spam(metaclass=Singleton):
         print("Initializing Spam")
 
 
+def test_spam():
+    s1 = Spam(1, 2, 3)
+    s2 = Spam()
+    assert s1 is s2
+
+
 if __name__ == "__main__":
     s1 = Spam(1, 2, 3)
     s2 = Spam()

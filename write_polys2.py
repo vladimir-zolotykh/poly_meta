@@ -19,7 +19,7 @@ def write_polys(f: BinaryIO) -> None:
     f.write(struct.pack("<i", num_polys))
     for _ in range(num_polys):
         for poly in polys:
-            f.write(struct.pack("<i", len(poly)))
+>            f.write(struct.pack("<i", len(poly)))
             for pt in poly:
                 f.write(struct.pack("<dd", *pt))
 
