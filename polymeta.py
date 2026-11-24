@@ -61,12 +61,12 @@ class Poly(metaclass=PolyMeta):
 def test_poly():
     with open("polys.dat", "rb") as f:
         poly = Poly(f.read())
-        print(poly.npolys)
-        print(poly.npoints0)
+        print(f"{poly.npolys = }")
+        print(f"{poly.npoints0 = }")
         print(poly.poly0)
-        print(poly.npoints1)
+        print(f"{poly.npoints1 = }")
         print(poly.poly1)
-        print(poly.npoints2)
+        print(f"{poly.npoints2 = }")
         print(poly.poly2)
 
 
