@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 import struct
+import write_polys2
 
 
 class Field:
@@ -29,19 +30,31 @@ class FieldWrap(Field):
 
 
 class PolyMeta(type):
-    def __new__(mcls, clsname, bases, clsdict):
+    def __new__(mcls, clsname, bases, clsdict, *, model=None):
         offset = 0
-        for k, v in clsdict.items():
-            if k[:2] == "__" and k[-2:] == "__":
-                continue
-            if isinstance(v, Field):
-                v.offset = offset
-                offset += struct.calcsize(v.fmt)
+        poly_names = []
+        npolys = len(model)
+        # f.write(struct.pack("<i", num_polys))
+        offset += struct.calcsize("<i")
+        for _ in range(npolys):
+            for k, poly in enumerate(model):
+                # f.write(struct.pack("<i", len(poly)))
+                offset += struct.calcsize("<i")
+                fmt = "<" + "dd" * len(poly)
+                poly_names.append(f"poly{k}")
+                clsdict[f"poly{k}"] = FieldWrap(fmt, offset)
+                offset += struct.calcsize(fmt)
+
+        def __iter__(self):
+            for a in poly_names:
+                yield getattr(self, a)
+
+        clsdict["__iter__"] = __iter__
         clsdict["_bufsize"] = offset
         return super().__new__(mcls, clsname, bases, clsdict)
 
 
-class Poly(metaclass=PolyMeta):
+class Poly(metaclass=PolyMeta, model=write_polys2.polys):
     npolys = Field("<i")
     npoints0 = Field("<i")
     poly0 = FieldWrap("<dddddd")
@@ -55,19 +68,15 @@ class Poly(metaclass=PolyMeta):
         self._buf = buf
 
     def __iter__(self):
-        pass
+        for a in ("poly0", "poly1", "poly2"):
+            yield getattr(self, a)
 
 
 def test_poly():
     with open("polys.dat", "rb") as f:
         poly = Poly(f.read())
-        print(f"{poly.npolys = }")
-        print(f"{poly.npoints0 = }")
-        print(poly.poly0)
-        print(f"{poly.npoints1 = }")
-        print(poly.poly1)
-        print(f"{poly.npoints2 = }")
-        print(poly.poly2)
+        for y in poly:
+            print(y)
 
 
 if __name__ == "__main__":
