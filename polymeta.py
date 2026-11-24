@@ -53,6 +53,12 @@ def test_poly():
     with open("polys.dat", "rb") as f:
         poly = Poly(f.read())
         print(poly.npolys)
+        print(poly.npoints0)
+        print(poly.poly0)
+        print(poly.npoints1)
+        print(poly.poly1)
+        print(poly.npoints2)
+        print(poly.poly2)
 
 
 if __name__ == "__main__":
