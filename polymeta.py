@@ -55,21 +55,21 @@ class PolyMeta(type):
 
 
 class Poly(metaclass=PolyMeta, model=write_polys2.polys):
-    npolys = Field("<i")
-    npoints0 = Field("<i")
-    poly0 = FieldWrap("<dddddd")
-    npoints1 = Field("<i")
-    poly1 = FieldWrap("<dddddddd")
-    npoints2 = Field("<i")
-    poly2 = FieldWrap("<dddddd")
+    # npolys = Field("<i")
+    # npoints0 = Field("<i")
+    # poly0 = FieldWrap("<dddddd")
+    # npoints1 = Field("<i")
+    # poly1 = FieldWrap("<dddddddd")
+    # npoints2 = Field("<i")
+    # poly2 = FieldWrap("<dddddd")
 
     def __init__(self, buf: bytearray):
         self._buf = bytearray(self._bufsize)
         self._buf = buf
 
-    def __iter__(self):
-        for a in ("poly0", "poly1", "poly2"):
-            yield getattr(self, a)
+    # def __iter__(self):
+    #     for a in ("poly0", "poly1", "poly2"):
+    #         yield getattr(self, a)
 
 
 def test_poly():
