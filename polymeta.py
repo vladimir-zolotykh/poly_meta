@@ -16,7 +16,17 @@ class Field:
         if isinstance is None:
             return self
         s = slice(self.offset, self.offset + struct.calcsize(self.fmt))
-        return struct.unpack_from(self.fmt, instance._buf[s])
+        t = struct.unpack_from(self.fmt, instance._buf[s])
+        return t if len(t) > 1 else t[0]
+
+
+class FieldWrap(Field):
+    def __get__(self, instance, owner):
+        if isinstance is None:
+            return self
+        s = slice(self.offset, self.offset + struct.calcsize(self.fmt))
+        t = struct.unpack_from(self.fmt, instance._buf[s])
+        return t
 
 
 class PolyMeta(type):
@@ -35,11 +45,11 @@ class PolyMeta(type):
 class Poly(metaclass=PolyMeta):
     npolys = Field("<i")
     npoints0 = Field("<i")
-    poly0 = Field("<dddddd")
+    poly0 = FieldWrap("<dddddd")
     npoints1 = Field("<i")
-    poly1 = Field("<dddddddd")
+    poly1 = FieldWrap("<dddddddd")
     npoints2 = Field("<i")
-    poly2 = Field("<dddddd")
+    poly2 = FieldWrap("<dddddd")
 
     def __init__(self, buf: bytearray):
         self._buf = bytearray(self._bufsize)
