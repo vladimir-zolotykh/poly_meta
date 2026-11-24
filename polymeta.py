@@ -17,15 +17,14 @@ class Field:
             return self
         s = slice(self.offset, self.offset + struct.calcsize(self.fmt))
         t = struct.unpack_from(self.fmt, instance._buf[s])
+        return self.provide(t)
+
+    def provide(self, t: tuple[float, float]) -> list[tuple[float, float]]:
         return t if len(t) > 1 else t[0]
 
 
 class FieldWrap(Field):
-    def __get__(self, instance, owner):
-        if isinstance is None:
-            return self
-        s = slice(self.offset, self.offset + struct.calcsize(self.fmt))
-        t = struct.unpack_from(self.fmt, instance._buf[s])
+    def provide(self, t: tuple[float, float]) -> list[tuple[float, float]]:
         return [tuple((t[k], t[k + 1])) for k in range(len(t) // 2)]
 
 
