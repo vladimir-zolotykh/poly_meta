@@ -26,7 +26,7 @@ class FieldWrap(Field):
             return self
         s = slice(self.offset, self.offset + struct.calcsize(self.fmt))
         t = struct.unpack_from(self.fmt, instance._buf[s])
-        return t
+        return [tuple((t[k], t[k + 1])) for k in range(len(t) // 2)]
 
 
 class PolyMeta(type):
