@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 import struct
+import textwrap
 import write_polys2
 
 
@@ -57,11 +58,18 @@ class Poly(metaclass=PolyMeta, model=write_polys2.polys):
         self._buf = buf
 
 
-def test_poly():
+def test_poly(capsys):
     with open("polys.dat", "rb") as f:
         poly = Poly(f.read())
         for y in poly:
             print(y)
+    assert capsys.readouterr().out == textwrap.dedent(
+        """\
+[(1.0, 2.5), (3.5, 4.0), (2.5, 1.5)]
+[(7.0, 1.2), (5.1, 3.0), (0.5, 7.5), (0.8, 9.0)]
+[(3.4, 6.3), (1.2, 0.5), (4.6, 9.2)]
+"""
+    )
 
 
 if __name__ == "__main__":
