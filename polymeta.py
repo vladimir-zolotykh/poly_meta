@@ -86,7 +86,7 @@ class PolyT(metaclass=PolyMeta, model=polys, wrapper=tuple):
 
 def test_poly_tuple(capsys):
     with open("polys.dat", "rb") as f:
-        poly = Poly(f.read())
+        poly = PolyT(f.read())
         for y in poly:
             print(y)
     assert capsys.readouterr().out == textwrap.dedent(
@@ -100,7 +100,7 @@ def test_poly_tuple(capsys):
 
 def test_poly_point(capsys):
     with open("polys.dat", "rb") as f:
-        poly = Poly(f.read())
+        poly = PolyP(f.read())
         for y in poly:
             print(y)
     assert capsys.readouterr().out == textwrap.dedent(
