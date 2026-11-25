@@ -26,8 +26,12 @@ class Field:
 
 
 class FieldWrap(Field):
+    def __init__(self, fmt: str, offset: int = 0, wrapper: type = tuple):
+        super().__init__(fmt, offset)
+        self.wrapper = wrapper
+
     def provide(self, t: tuple[float, float]) -> list[tuple[float, float]]:
-        return [tuple((t[k * 2], t[k * 2 + 1])) for k in range(len(t) // 2)]
+        return [self.wrapper((t[k * 2], t[k * 2 + 1])) for k in range(len(t) // 2)]
 
 
 class PolyMeta(type):
@@ -38,7 +42,7 @@ class PolyMeta(type):
         for k, poly in enumerate(model):
             offset += struct.calcsize("<i")
             fmt = "<" + "dd" * len(poly)
-            clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset)
+            clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset, tuple)
             names.append(name)
             offset += struct.calcsize(fmt)
 
