@@ -34,13 +34,12 @@ class PolyMeta(type):
     def __new__(mcls, clsname, bases, clsdict, *, model=None):
         offset = 0
         names = []
-        npolys = len(model)
         offset += struct.calcsize("<i")
         for k, poly in enumerate(model):
             offset += struct.calcsize("<i")
             fmt = "<" + "dd" * len(poly)
-            names.append(f"poly{k}")
-            clsdict[f"poly{k}"] = FieldWrap(fmt, offset)
+            clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset)
+            names.append(name)
             offset += struct.calcsize(fmt)
 
         def __iter__(self):
