@@ -3,7 +3,7 @@
 # PYTHON_ARGCOMPLETE_OK
 import struct
 import textwrap
-import write_polys2
+from write_polys2 import polys, Point
 
 
 class Field:
@@ -55,7 +55,7 @@ class PolyMeta(type):
         return super().__new__(mcls, clsname, bases, clsdict)
 
 
-class Poly(metaclass=PolyMeta, model=write_polys2.polys):
+class Poly(metaclass=PolyMeta, model=polys):
     def __init__(self, buf: bytearray):
         self._buf = bytearray(self._bufsize)
         self._buf = buf
