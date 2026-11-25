@@ -30,19 +30,30 @@ class FieldWrap(Field):
         super().__init__(fmt, offset)
         self.wrapper = wrapper
 
-    def provide(self, t: tuple[float, float]) -> list[tuple[float, float]]:
-        return [self.wrapper((t[k * 2], t[k * 2 + 1])) for k in range(len(t) // 2)]
+    # def provide(self, t: tuple[float, float]) -> list[tuple[float, float]]:
+    #     # return [self.wrapper((t[k * 2], t[k * 2 + 1])) for k in range(len(t) // 2)]
+    #     return [self.wrapper(t[k * 2], t[k * 2 + 1]) for k in range(len(t) // 2)]
+
+    def provide(
+        self, t: tuple[float, float]
+    ) -> list[tuple[float, float]] | list[Point]:
+        if issubclass(self.wrapper, tuple):
+            return [self.wrapper((t[k * 2], t[k * 2 + 1])) for k in range(len(t) // 2)]
+        elif issubclass(self.wrapper, Point):
+            return [self.wrapper(t[k * 2], t[k * 2 + 1]) for k in range(len(t) // 2)]
+        raise TypeError(f"{self.wrapper} must be tuple or Point")
 
 
 class PolyMeta(type):
-    def __new__(mcls, clsname, bases, clsdict, *, model=None):
+    def __new__(mcls, clsname, bases, clsdict, *, model=None, wrapper=tuple):
         offset = 0
         names = []
         offset += struct.calcsize("<i")
         for k, poly in enumerate(model):
             offset += struct.calcsize("<i")
             fmt = "<" + "dd" * len(poly)
-            clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset, tuple)
+            # clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset, tuple)
+            clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset, Point)
             names.append(name)
             offset += struct.calcsize(fmt)
 
@@ -61,7 +72,7 @@ class Poly(metaclass=PolyMeta, model=polys):
         self._buf = buf
 
 
-def test_poly(capsys):
+def test_poly_tuple(capsys):
     with open("polys.dat", "rb") as f:
         poly = Poly(f.read())
         for y in poly:
@@ -71,6 +82,20 @@ def test_poly(capsys):
 [(1.0, 2.5), (3.5, 4.0), (2.5, 1.5)]
 [(7.0, 1.2), (5.1, 3.0), (0.5, 7.5), (0.8, 9.0)]
 [(3.4, 6.3), (1.2, 0.5), (4.6, 9.2)]
+"""
+    )
+
+
+def test_poly_point(capsys):
+    with open("polys.dat", "rb") as f:
+        poly = Poly(f.read())
+        for y in poly:
+            print(y)
+    assert capsys.readouterr().out == textwrap.dedent(
+        """\
+[Point(1.0, 2.5), Point(3.5, 4.0), Point(2.5, 1.5)]
+[Point(7.0, 1.2), Point(5.1, 3.0), Point(0.5, 7.5), Point(0.8, 9.0)]
+[Point(3.4, 6.3), Point(1.2, 0.5), Point(4.6, 9.2)]
 """
     )
 
