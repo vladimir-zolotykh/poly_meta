@@ -53,7 +53,7 @@ class PolyMeta(type):
             offset += struct.calcsize("<i")
             fmt = "<" + "dd" * len(poly)
             # clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset, tuple)
-            clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset, Point)
+            clsdict[name := f"poly{k}"] = FieldWrap(fmt, offset, wrapper)
             names.append(name)
             offset += struct.calcsize(fmt)
 
@@ -66,7 +66,19 @@ class PolyMeta(type):
         return super().__new__(mcls, clsname, bases, clsdict)
 
 
-class Poly(metaclass=PolyMeta, model=polys):
+class Poly(metaclass=PolyMeta, model=polys, wrapper=Point):
+    def __init__(self, buf: bytearray):
+        self._buf = bytearray(self._bufsize)
+        self._buf = buf
+
+
+class PolyP(metaclass=PolyMeta, model=polys, wrapper=Point):
+    def __init__(self, buf: bytearray):
+        self._buf = bytearray(self._bufsize)
+        self._buf = buf
+
+
+class PolyT(metaclass=PolyMeta, model=polys, wrapper=tuple):
     def __init__(self, buf: bytearray):
         self._buf = bytearray(self._bufsize)
         self._buf = buf
